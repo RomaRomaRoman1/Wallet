@@ -1,0 +1,4 @@
+org\example\controller\WalletControllerGetTest.class
+org\example\controller\WalletControllerTest.class
+org\example\service\WalletServiceTest.class
+org\example\repository\WalletRepositoryTest.class

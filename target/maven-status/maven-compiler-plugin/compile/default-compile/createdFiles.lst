@@ -1,0 +1,9 @@
+org\example\entity\Wallet.class
+org\example\controller\WalletController.class
+org\example\repository\WalletRepository.class
+org\example\dto\WalletOperationRequest$OperationType.class
+org\example\exception\WalletNotFoundException.class
+org\example\App.class
+org\example\dto\WalletOperationRequest.class
+org\example\service\WalletService.class
+org\example\exception\InsufficientFundsException.class

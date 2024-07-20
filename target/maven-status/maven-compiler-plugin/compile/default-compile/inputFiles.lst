@@ -1,0 +1,8 @@
+C:\Users\Roman\IdeaProjects\Wallet\src\main\java\org\example\exception\WalletNotFoundException.java
+C:\Users\Roman\IdeaProjects\Wallet\src\main\java\org\example\App.java
+C:\Users\Roman\IdeaProjects\Wallet\src\main\java\org\example\entity\Wallet.java
+C:\Users\Roman\IdeaProjects\Wallet\src\main\java\org\example\dto\WalletOperationRequest.java
+C:\Users\Roman\IdeaProjects\Wallet\src\main\java\org\example\exception\InsufficientFundsException.java
+C:\Users\Roman\IdeaProjects\Wallet\src\main\java\org\example\repository\WalletRepository.java
+C:\Users\Roman\IdeaProjects\Wallet\src\main\java\org\example\controller\WalletController.java
+C:\Users\Roman\IdeaProjects\Wallet\src\main\java\org\example\service\WalletService.java
