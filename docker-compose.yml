@@ -11,6 +11,7 @@ services:
       - db
     # Указываем, что сервис "web" зависит от сервиса "db" и должен запуститься после него.
     environment:
+    #блок environment в docker-compose.yml используется для задания переменных окружения, которые будут доступны внутри контейнера.
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
       # Устанавливаем URL для подключения к базе данных PostgreSQL.
       - SPRING_DATASOURCE_USERNAME=postgres
