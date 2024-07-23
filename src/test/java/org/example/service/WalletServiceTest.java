@@ -42,7 +42,7 @@ public class WalletServiceTest {
     public void testProcessOperation_Deposit() throws WalletNotFoundException, InsufficientFundsException {
         WalletOperationRequest request = new WalletOperationRequest(walletId, WalletOperationRequest.OperationType.DEPOSIT, BigDecimal.valueOf(50)); // Создаем запрос на депозит
 
-        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet)); // Настраиваем мок, чтобы вернуть созданный кошелек
+        when(walletRepository.findByIdWithLock(walletId)).thenReturn(Optional.of(wallet)); // Настраиваем мок, чтобы вернуть созданный кошелек
 
         walletService.processOperation(request); // Выполняем операцию депозита
 
@@ -54,7 +54,7 @@ public class WalletServiceTest {
     public void testProcessOperation_Withdraw() throws WalletNotFoundException, InsufficientFundsException {
         WalletOperationRequest request = new WalletOperationRequest(walletId, WalletOperationRequest.OperationType.WITHDRAW, BigDecimal.valueOf(50)); // Создаем запрос на снятие
 
-        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet)); // Настраиваем мок, чтобы вернуть созданный кошелек
+        when(walletRepository.findByIdWithLock(walletId)).thenReturn(Optional.of(wallet)); // Настраиваем мок, чтобы вернуть созданный кошелек
 
         walletService.processOperation(request); // Выполняем операцию снятия
 
@@ -66,7 +66,7 @@ public class WalletServiceTest {
     public void testProcessOperation_InsufficientFunds() {
         WalletOperationRequest request = new WalletOperationRequest(walletId, WalletOperationRequest.OperationType.WITHDRAW, BigDecimal.valueOf(150)); // Создаем запрос на снятие больше текущего баланса
 
-        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet)); // Настраиваем мок, чтобы вернуть созданный кошелек
+        when(walletRepository.findByIdWithLock(walletId)).thenReturn(Optional.of(wallet)); // Настраиваем мок, чтобы вернуть созданный кошелек
 
         assertThrows(InsufficientFundsException.class, () -> {
             walletService.processOperation(request); // Проверяем, что выбрасывается исключение InsufficientFundsException
@@ -79,7 +79,7 @@ public class WalletServiceTest {
     public void testProcessOperation_WalletNotFound() {
         WalletOperationRequest request = new WalletOperationRequest(walletId, WalletOperationRequest.OperationType.DEPOSIT, BigDecimal.valueOf(50)); // Создаем запрос на депозит
 
-        when(walletRepository.findById(walletId)).thenReturn(Optional.empty()); // Настраиваем мок, чтобы не возвращать кошелек
+        when(walletRepository.findByIdWithLock(walletId)).thenReturn(Optional.empty()); // Настраиваем мок, чтобы не возвращать кошелек
 
         assertThrows(WalletNotFoundException.class, () -> {
             walletService.processOperation(request); // Проверяем, что выбрасывается исключение WalletNotFoundException

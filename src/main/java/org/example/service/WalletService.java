@@ -1,6 +1,6 @@
 package org.example.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.example.dto.WalletOperationRequest;
 import org.example.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import com.google.common.util.concurrent.RateLimiter;
+import org.springframework.transaction.annotation.Isolation;
 
 @Service  // Указывает, что этот класс является сервисом в бизнес-логике приложения.
 public class WalletService {
@@ -28,7 +29,7 @@ public class WalletService {
     // Хранит RateLimiter для управления количеством запросов к кошелькам. Используется потокобезопасная коллекция.
     // Нужен в первую очередь для того, чтобы запоминать уже существующие ограничения на обращения к каждому кошельку.
 
-    @Transactional  // Обозначает, что метод должен выполняться в рамках одной транзакции. Все операции в методе будут зафиксированы как единое целое.
+    @Transactional(isolation = Isolation.SERIALIZABLE)  // Обозначает, что метод должен выполняться в рамках одной транзакции. Все операции в методе будут зафиксированы как единое целое.
     public void processOperation(WalletOperationRequest request) throws WalletNotFoundException, InsufficientFundsException {
         RateLimiter rateLimiter = walletRateLimiters.computeIfAbsent(request.getWalletId(), k -> RateLimiter.create(1000));
         // Получение или создание RateLimiter для указанного идентификатора кошелька. RateLimiter используется для ограничения
@@ -36,7 +37,8 @@ public class WalletService {
         rateLimiter.acquire();  // Ограничение на 1000 запросов в секунду
 
         // Поиск кошелька по идентификатору из запроса. Если кошелек не найден, выбрасывается исключение WalletNotFoundException.
-        Wallet wallet = walletRepository.findById(request.getWalletId())
+        // Используем пессимистичную блокировку для предотвращения одновременного изменения данных
+        Wallet wallet = walletRepository.findByIdWithLock(request.getWalletId())
                 .orElseThrow(() -> new WalletNotFoundException(request.getWalletId()));
 
         // Проверка типа операции. Если операция - снятие средств (WITHDRAW), выполняем соответствующую логику.
@@ -64,7 +66,7 @@ public class WalletService {
 
         rateLimiter.acquire();  // Ограничение на 1000 запросов в секунду
         // Поиск кошелька по идентификатору. Если кошелек не найден, выбрасывается исключение WalletNotFoundException.
-        Wallet wallet = walletRepository.findById(walletId)
+        Wallet wallet = walletRepository.findByIdWithLock(walletId)
                 .orElseThrow(() -> new WalletNotFoundException(walletId));
         // Возврат текущего баланса кошелька.
         return wallet.getBalance();

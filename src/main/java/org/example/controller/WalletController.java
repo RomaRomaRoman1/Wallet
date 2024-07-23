@@ -26,6 +26,7 @@ public class WalletController {
     }
 
     @PostMapping // Обрабатывает HTTP POST запросы по пути "/api/v1/wallet".
+    //@RequestBody указывает Spring, что тело запроса должно быть десериализовано в объект класса WalletOperationRequest
     public ResponseEntity<String> performOperation(@RequestBody WalletOperationRequest request) {
         try {
             // Вызов метода обработки операции из сервиса. Если возникнут ошибки, они будут пойманы в блоке catch.

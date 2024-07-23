@@ -20,7 +20,7 @@ public class Wallet {
     @Id
     private UUID id;
     private BigDecimal balance;
-
+    // Обозначает поле, используемое для оптимистичной блокировки. Это поле автоматически увеличивается при каждом обновлении.
     @Version
     private Long version;
 }

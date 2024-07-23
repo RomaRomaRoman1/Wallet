@@ -23,64 +23,72 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
-@WebMvcTest(WalletController.class)
+@WebMvcTest(WalletController.class) // Аннотация для тестирования только слоя Web MVC (контроллеров) в Spring Boot
 public class WalletControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private MockMvc mockMvc; // Объект для имитации HTTP-запросов к контроллерам
 
     @MockBean
-    private WalletService walletService; // Используем @MockBean вместо @Mock
+    private WalletService walletService; // Мок-объект для WalletService, используем @MockBean для интеграции с Spring
 
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper; // Объект для преобразования Java объектов в JSON и обратно
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.openMocks(this); // Инициализация мок-объектов перед каждым тестом
 
-        objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper(); // Инициализация ObjectMapper для преобразования JSON
     }
 
     @Test
     public void testPerformOperation_Success() throws Exception {
+        // Создание объекта WalletOperationRequest с случайным UUID, типом операции DEPOSIT и суммой 100
         WalletOperationRequest request = new WalletOperationRequest(
                 UUID.randomUUID(), WalletOperationRequest.OperationType.DEPOSIT, BigDecimal.valueOf(100)
         );
 
+        // Выполнение HTTP POST запроса к "/api/v1/wallet"
         mockMvc.perform(post("/api/v1/wallet")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Operation successful"));
+                        .contentType(MediaType.APPLICATION_JSON) // Установка типа контента запроса как JSON
+                        .content(objectMapper.writeValueAsString(request))) // Преобразование объекта request в JSON-строку
+                .andExpect(status().isOk()) // Ожидание HTTP статуса 200 (OK)
+                .andExpect(content().string("Operation successful")); // Ожидание текста ответа "Operation successful"
     }
 
     @Test
     public void testPerformOperation_WalletNotFound() throws Exception {
+        // Создание объекта WalletOperationRequest с случайным UUID, типом операции DEPOSIT и суммой 100
         WalletOperationRequest request = new WalletOperationRequest(
                 UUID.randomUUID(), WalletOperationRequest.OperationType.DEPOSIT, BigDecimal.valueOf(100)
         );
 
+        // Настройка мока для броска исключения WalletNotFoundException при вызове processOperation
         doThrow(new WalletNotFoundException(request.getWalletId())).when(walletService).processOperation(any());
 
+        // Выполнение HTTP POST запроса к "/api/v1/wallet"
         mockMvc.perform(post("/api/v1/wallet")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Wallet not found with UUID: " + request.getWalletId()));
+                        .contentType(MediaType.APPLICATION_JSON) // Установка типа контента запроса как JSON
+                        .content(objectMapper.writeValueAsString(request))) // Преобразование объекта request в JSON-строку
+                .andExpect(status().isBadRequest()) // Ожидание HTTP статуса 400 (Bad Request)
+                .andExpect(content().string("Wallet not found with UUID: " + request.getWalletId())); // Ожидание текста ошибки
     }
 
     @Test
     public void testPerformOperation_InsufficientFunds() throws Exception {
+        // Создание объекта WalletOperationRequest с случайным UUID, типом операции WITHDRAW и суммой 100
         WalletOperationRequest request = new WalletOperationRequest(
                 UUID.randomUUID(), WalletOperationRequest.OperationType.WITHDRAW, BigDecimal.valueOf(100)
         );
 
+        // Настройка мока для броска исключения InsufficientFundsException при вызове processOperation
         doThrow(new InsufficientFundsException(request.getAmount())).when(walletService).processOperation(any());
 
+        // Выполнение HTTP POST запроса к "/api/v1/wallet"
         mockMvc.perform(post("/api/v1/wallet")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Insufficient funds for amount: " + request.getAmount()));
+                        .contentType(MediaType.APPLICATION_JSON) // Установка типа контента запроса как JSON
+                        .content(objectMapper.writeValueAsString(request))) // Преобразование объекта request в JSON-строку
+                .andExpect(status().isBadRequest()) // Ожидание HTTP статуса 400 (Bad Request)
+                .andExpect(content().string("Insufficient funds for amount: " + request.getAmount())); // Ожидание текста ошибки
     }
 }

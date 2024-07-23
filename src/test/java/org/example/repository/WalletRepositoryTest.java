@@ -25,7 +25,7 @@ public class WalletRepositoryTest { // Объявление класса WalletR
         Wallet wallet = new Wallet(UUID.randomUUID(), BigDecimal.valueOf(100), 1L); // Создание нового объекта Wallet с уникальным UUID, балансом 100 и версией 1.
         walletRepository.save(wallet); // Сохранение объекта Wallet в базе данных.
 
-        Wallet foundWallet = walletRepository.findById(wallet.getId()).orElse(null); // Поиск сохраненного Wallet по его ID.
+        Wallet foundWallet = walletRepository.findByIdWithLock(wallet.getId()).orElse(null); // Поиск сохраненного Wallet по его ID.
         assertEquals(wallet.getId(), foundWallet.getId()); // Проверка, что ID найденного кошелька совпадает с исходным ID.
         assertEquals(wallet.getBalance(), foundWallet.getBalance()); // Проверка, что баланс найденного кошелька совпадает с исходным балансом.
     }
@@ -35,7 +35,7 @@ public class WalletRepositoryTest { // Объявление класса WalletR
         Wallet wallet = new Wallet(UUID.randomUUID(), BigDecimal.valueOf(100), 1L); // Создание нового объекта Wallet с уникальным UUID, балансом 100 и версией 1.
         walletRepository.save(wallet); // Сохранение объекта Wallet в базе данных.
 
-        Wallet foundWallet = walletRepository.findById(wallet.getId()).orElse(null); // Поиск сохраненного Wallet по его ID.
+        Wallet foundWallet = walletRepository.findByIdWithLock(wallet.getId()).orElse(null); // Поиск сохраненного Wallet по его ID.
         foundWallet.setBalance(BigDecimal.valueOf(200)); // Изменение баланса найденного кошелька на 200.
         assertEquals(foundWallet.getBalance(), BigDecimal.valueOf(200)); // Проверка, что новый баланс найденного кошелька равен 200.
     }
