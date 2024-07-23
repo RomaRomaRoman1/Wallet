@@ -1,14 +1,14 @@
 package org.example.controller;
 
 import org.example.dto.WalletOperationRequest;
+import org.example.exception.InsufficientFundsException;
+import org.example.exception.WalletNotFoundException;
 import org.example.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.example.exception.WalletNotFoundException;
-import org.example.exception.InsufficientFundsException;
 import java.util.UUID;
 
 import java.math.BigDecimal;
@@ -27,25 +27,18 @@ public class WalletController {
 
     @PostMapping // Обрабатывает HTTP POST запросы по пути "/api/v1/wallet".
     //@RequestBody указывает Spring, что тело запроса должно быть десериализовано в объект класса WalletOperationRequest
-    public ResponseEntity<String> performOperation(@RequestBody WalletOperationRequest request) {
-        try {
+    public ResponseEntity<String> performOperation(@RequestBody WalletOperationRequest request) throws WalletNotFoundException, InsufficientFundsException {
             // Вызов метода обработки операции из сервиса. Если возникнут ошибки, они будут пойманы в блоке catch.
             walletService.processOperation(request);
             // Если операция прошла успешно, возвращаем HTTP статус 200 (OK) с сообщением об успешном выполнении.
             return ResponseEntity.ok("Operation successful");
-        } catch (WalletNotFoundException | InsufficientFundsException e) {
-            // Если произошла ошибка, возвращаем HTTP статус 400 (Bad Request) и сообщение об ошибке.
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
     }
 
     @GetMapping("/{walletId}")
-    public ResponseEntity<String> getBalance(@PathVariable UUID walletId) {
-        try {
+    public ResponseEntity<String> getBalance(@PathVariable UUID walletId) throws WalletNotFoundException {
+
             BigDecimal balance = walletService.getBalance(walletId);
             return ResponseEntity.ok(String.valueOf(balance));
-        } catch (WalletNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-}
