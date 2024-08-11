@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.dto.WalletOperationRequest;
+import org.example.entity.Client;
 import org.example.entity.Wallet;
 import org.example.exception.InsufficientFundsException;
 import org.example.exception.WalletNotFoundException;
@@ -21,7 +22,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class WalletServiceTest {
-
     @Mock
     private WalletRepository walletRepository; // Создаем мок объект для WalletRepository
 
@@ -35,7 +35,9 @@ public class WalletServiceTest {
     public void setup() {
         MockitoAnnotations.openMocks(this); // Инициализируем моки перед каждым тестом
         walletId = UUID.randomUUID(); // Создаем уникальный UUID для кошелька
-        wallet = new Wallet(walletId, BigDecimal.valueOf(100), 1L); // Создаем новый объект Wallet с начальным балансом
+        Client client = new Client(UUID.randomUUID(), "Roman", "Roman", "rom@mail.ru");
+        wallet = new Wallet(UUID.randomUUID(), BigDecimal.valueOf(100), 1L, client); // Создание нового объекта Wallet с уникальным UUID, балансом 100 и версией 1.
+
     }
 
     @Test

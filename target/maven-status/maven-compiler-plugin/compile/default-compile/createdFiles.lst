@@ -1,9 +1,14 @@
-org\example\entity\Wallet.class
 org\example\controller\WalletController.class
 org\example\repository\WalletRepository.class
+org\example\entity\Purchase.class
 org\example\dto\WalletOperationRequest$OperationType.class
+org\example\controller\GlobalExceptionHandler.class
+org\example\service\WalletService.class
+org\example\entity\OnlinePurchase.class
+org\example\entity\User.class
+org\example\entity\Wallet.class
 org\example\exception\WalletNotFoundException.class
 org\example\App.class
 org\example\dto\WalletOperationRequest.class
-org\example\service\WalletService.class
 org\example\exception\InsufficientFundsException.class
+org\example\entity\OfflinePurchase.class

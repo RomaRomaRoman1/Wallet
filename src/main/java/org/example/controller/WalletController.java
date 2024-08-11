@@ -1,8 +1,14 @@
 package org.example.controller;
 
+import org.aspectj.weaver.ast.Var;
+import org.example.dto.ClientDto;
 import org.example.dto.WalletOperationRequest;
+import org.example.entity.Client;
+import org.example.exception.AlreadyExistWIthThisEmail;
 import org.example.exception.InsufficientFundsException;
 import org.example.exception.WalletNotFoundException;
+import org.example.repository.OnlinePurchaseRepository;
+import org.example.repository.UserRepository;
 import org.example.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +25,14 @@ import java.math.BigDecimal;
 public class WalletController {
 
     private final WalletService walletService; // Сервис для обработки операций с кошельками.
+    private final UserRepository userRepository;
+    private final OnlinePurchaseRepository onlinePurchaseRepository;
 
     @Autowired // Аннотация, указывающая Spring автоматически внедрит зависимость через конструктор.
-    public WalletController(WalletService walletService) {
+    public WalletController(WalletService walletService, UserRepository userRepository, OnlinePurchaseRepository onlinePurchaseRepository) {
         this.walletService = walletService; // Инициализация сервиса через конструктор.
+        this.userRepository = userRepository;
+        this.onlinePurchaseRepository = onlinePurchaseRepository;
     }
 
     @PostMapping // Обрабатывает HTTP POST запросы по пути "/api/v1/wallet".
@@ -41,4 +51,19 @@ public class WalletController {
             BigDecimal balance = walletService.getBalance(walletId);
             return ResponseEntity.ok(String.valueOf(balance));
         }
+        @PostMapping("/{client}")
+    public ResponseEntity<String> createClient(@RequestBody ClientDto clientDto) throws AlreadyExistWIthThisEmail {
+        walletService.createUser(clientDto);
+        return ResponseEntity.ok("Client has been created");
+    }
+    @PostMapping("/{online}")
+    public ResponseEntity<String> addOnlinePurchase (@RequestParam String storeAddress,@RequestParam BigDecimal amount,@RequestParam UUID walletId) throws WalletNotFoundException, InsufficientFundsException {
+        walletService.addOnlinePurchase(storeAddress, amount, walletId);
+        return ResponseEntity.ok("Purchase has been saved");
+    }
+    @PostMapping("/{online}")
+    public ResponseEntity<String> addOfflinePurchase (@RequestParam String storeUrl,@RequestParam BigDecimal amount,@RequestParam UUID walletId) throws WalletNotFoundException, InsufficientFundsException {
+        walletService.addOnlinePurchase(storeUrl, amount, walletId);
+        return ResponseEntity.ok("Purchase has been saved");
+    }
     }
